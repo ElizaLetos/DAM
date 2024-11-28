@@ -15,8 +15,7 @@ class UserTest {
     }
 
     @Test
-    public void testDefaultConstructor() {
-        User defaultUser = new User();
+    public void testDefaultConstructor() {        User defaultUser = new User();
         assertNotNull(defaultUser, "Default constructor should create a non-null object");
         assertEquals(0, defaultUser.getId(), "Default ID should be 0");
         assertNull(defaultUser.getName(), "Default name should be null");
