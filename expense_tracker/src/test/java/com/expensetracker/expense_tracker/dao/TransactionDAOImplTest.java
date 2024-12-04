@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -28,7 +29,8 @@ class TransactionDAOImplTest {
     }
 
     @Test
-    @Sql("classpath:test_sql/create-test-data.sql")
+    @DirtiesContext
+    @Sql(scripts = {"classpath:test_sql/cleanup.sql", "classpath:test_sql/create-test-data.sql"})
     void getTransactionsByType() {
         List<Transaction> transactions = transactionDAO.getTransactionsByType(TypeOfTransaction.EXPENSE, 1);
 
@@ -39,7 +41,8 @@ class TransactionDAOImplTest {
     }
 
     @Test
-    @Sql("classpath:test_sql/create-test-data.sql")
+    @DirtiesContext
+    @Sql(scripts = {"classpath:test_sql/cleanup.sql", "classpath:test_sql/create-test-data.sql"})
     void findIdByUsername() {
         int userId = transactionDAO.findIdByUsername("Leslie");
 
@@ -47,7 +50,8 @@ class TransactionDAOImplTest {
     }
 
     @Test
-    @Sql("classpath:test_sql/create-test-data.sql")
+    @DirtiesContext
+    @Sql(scripts = {"classpath:test_sql/cleanup.sql", "classpath:test_sql/create-test-data.sql"})
     public void testFindIdByUsername_UserNotFound() {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -59,7 +63,8 @@ class TransactionDAOImplTest {
     }
 
     @Test
-    @Sql("classpath:test_sql/create-test-data.sql")
+    @DirtiesContext
+    @Sql(scripts = {"classpath:test_sql/cleanup.sql", "classpath:test_sql/create-test-data.sql"})
     void getTransactionsFromUser() {
         List<Transaction> transactions = transactionDAO.getTransactionsFromUser(1);
 
