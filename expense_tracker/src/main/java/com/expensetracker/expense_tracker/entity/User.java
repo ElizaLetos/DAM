@@ -2,10 +2,11 @@ package com.expensetracker.expense_tracker.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -22,11 +23,14 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Expense> expenses;
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private List<Role> roles;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Income> incomes;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+    private Collection<Transaction> transactions;
 
     public User() {
     }
@@ -37,12 +41,12 @@ public class User {
         this.password = password;
     }
 
-    public User(String name, String email, String password, List<Expense> expenses, List<Income> incomes) {
+    public User(String name, String email, String password, List<Role> roles, Collection<Transaction> transactions) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.expenses = expenses;
-        this.incomes = incomes;
+        this.roles = roles;
+        this.transactions = transactions;
     }
 
     public int getId() {
@@ -77,20 +81,20 @@ public class User {
         this.password = password;
     }
 
-    public List<Expense> getExpenses() {
-        return expenses;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setExpenses(List<Expense> expenses) {
-        this.expenses = expenses;
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
-    public List<Income> getIncomes() {
-        return incomes;
+    public Collection<Transaction> getTransactions() {
+        return transactions;
     }
 
-    public void setIncomes(List<Income> incomes) {
-        this.incomes = incomes;
+    public void setTransactions(Collection<Transaction> transactions) {
+        this.transactions = transactions;
     }
 
     @Override
@@ -100,8 +104,8 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", expenses=" + expenses +
-                ", incomes=" + incomes +
+                ", roles=" + roles +
+                ", transactions=" + transactions +
                 '}';
     }
 }

@@ -2,8 +2,6 @@ package com.expensetracker.expense_tracker.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
-
 @Entity
 @Table(name = "category")
 public class Category {
@@ -16,18 +14,14 @@ public class Category {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "date")
-    private Date date;
-
     @Column(name = "description")
     private String description;
 
     public Category() {
     }
 
-    public Category(String name, Date date, String description) {
+    public Category(String name, String description) {
         this.name = name;
-        this.date = date;
         this.description = description;
     }
 
@@ -47,14 +41,6 @@ public class Category {
         this.name = name;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -68,7 +54,6 @@ public class Category {
         return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", date=" + date +
                 ", description='" + description + '\'' +
                 '}';
     }
