@@ -5,104 +5,108 @@ USE `expense_tracker`;
 -- Table structure for table `category`
 --
 
-DROP TABLE IF EXISTS `category`;
 
 CREATE TABLE `category` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) DEFAULT NULL,
-  `date` date DEFAULT NULL,
-  `description` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `name` varchar(45) DEFAULT NULL,
+                            `description` varchar(45) DEFAULT NULL,
+                            PRIMARY KEY (id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `user`
+-- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `user`;
 
-CREATE TABLE `user` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) DEFAULT NULL,
-  `email` varchar(45) DEFAULT NULL,
-  `password` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE `users` (
+                         `id` int NOT NULL AUTO_INCREMENT,
+                         `name` varchar(45) DEFAULT NULL,
+                         `email` varchar(45) DEFAULT NULL,
+                         `password` char(80)  DEFAULT NULL,
+                         PRIMARY KEY (id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+--
+-- Table structure for table `transaction`
+--
+
+CREATE TABLE `transaction` (
+                               `id` int NOT NULL AUTO_INCREMENT,
+                               `user_id` int NOT NULL,
+                               `category_id` int NOT NULL,
+                               `amount` double DEFAULT NULL,
+                               `payment_type` ENUM('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'BANK_TRANSFER', 'GIFT_CARD', 'CRYPTOCURRENCY') NOT NULL,
+                               `date` date DEFAULT NULL,
+                               `note` varchar(45) DEFAULT NULL,
+                               `type_of_transaction` ENUM('INCOME', 'EXPENSE') NOT NULL,
+                               PRIMARY KEY (id),
+                               FOREIGN KEY (user_id) REFERENCES users(id),
+                               FOREIGN KEY (category_id) REFERENCES category(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `expense`
+-- Table structure for table `role_user`
 --
 
-DROP TABLE IF EXISTS `expense`;
 
-CREATE TABLE `expense` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `amount` double DEFAULT NULL,
-  `category_id` int NOT NULL,
-  `date` date DEFAULT NULL,
-  `payment_type` varchar(45) DEFAULT NULL,
-  `note` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (user_id) REFERENCES user(id),
-  FOREIGN KEY (category_id) REFERENCES category(id)
+CREATE TABLE `user_roles` (
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `user_id` int NOT NULL,
+                              `role` ENUM('ROLE_ADMIN', 'ROLE_USER') DEFAULT 'ROLE_USER',
+                              PRIMARY KEY (id),
+                              FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `income`
+-- Data for table `users`
 --
 
-DROP TABLE IF EXISTS `income`;
+INSERT INTO `users` (`name`, `email`, `password`) VALUES
+                                                      ('Leslie', 'leslie@gmail.com', '$2a$12$kAafc0OInCawdTNwJ/R/5.xMP5ZjvGoTob.rE3oavKiLn2t4kviQ.'),
+                                                      ('Emma', 'emma@gmail.com', '$2a$12$kAafc0OInCawdTNwJ/R/5.xMP5ZjvGoTob.rE3oavKiLn2t4kviQ.'),
+                                                      ('Avani', 'avani@gmail.com', '$2a$12$kAafc0OInCawdTNwJ/R/5.xMP5ZjvGoTob.rE3oavKiLn2t4kviQ.'),
+                                                      ('Ana', 'ana@gmail.com', '$2a$12$kAafc0OInCawdTNwJ/R/5.xMP5ZjvGoTob.rE3oavKiLn2t4kviQ.'),
+                                                      ('John', 'john@gmail.com', '$2a$12$kAafc0OInCawdTNwJ/R/5.xMP5ZjvGoTob.rE3oavKiLn2t4kviQ.'),
+                                                      ('Yuri', 'yuri@gmail.com', '$2a$12$kAafc0OInCawdTNwJ/R/5.xMP5ZjvGoTob.rE3oavKiLn2t4kviQ.');
 
-CREATE TABLE `income` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `amount` double DEFAULT NULL,
-  `category_id` int NOT NULL,
-  `date` date DEFAULT NULL,
-  `payment_type` varchar(45) DEFAULT NULL,
-  `note` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (user_id) REFERENCES user(id),
-  FOREIGN KEY (category_id) REFERENCES category(id)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-
---
--- Data for table `user`
---
-
-INSERT INTO `user` VALUES 
-	('Leslie','leslie@gmail.com','password123'),
-	('Emma','emma@gmail.com','test'),
-	('Avani','avani@gmail.com','test123'),
-	('Yuri','yuri@gmail.com','123test');
-    
 --
 -- Data for table `category`
 --
 
-	INSERT INTO `expense_tracker`.`category`
-(`name`, `date`, `description`)
+INSERT INTO `category`
+(`name`, `description`)
 VALUES
-('Food', '2024-09-30', 'Dinner with friends'),
-('Transport','2024-10-02', 'Taxi to work'),
-('Gift', '2024-08-20', '1 year aniversary'),
-('Salary', '2024-10-25', '');
+    ('Food', 'Expenses on restaurant, supermarket'),
+    ('Transport', 'Taxi, train, bus'),
+    ('Gift', 'Anniversary'),
+    ('Beauty', 'Glam'),
+    ('Social life', 'Going out with friends'),
+    ('Clothes', null),
+    ('Education', 'Books, courses'),
+    ('Health', 'Hospital, farmacy');
 
 --
--- Data for table `expense`
+-- Data for table `transaction`
 --
 
-INSERT INTO `expense_tracker`.`expense`
-(`user_id`, `amount`, `category_id`, `date`, `payment_type`, `note`)
+INSERT INTO `transaction`
+(`user_id`, `category_id`, `amount`, `date`, `payment_type`, `note`, `type_of_transaction`)
 VALUES
-(1, 200, 1, '2024-10-02', 'Credit Card', null);
+    (1, 2, 200, '2024-10-02', 'CREDIT_CARD', 'good time with friends', 'EXPENSE'),
+    (1, 3, 500, '2024-11-09', 'DEBIT_CARD', '1 year anniversary', 'INCOME'),
+    (1, 8, 1000, '2024-10-05', 'CREDIT_CARD', null, 'EXPENSE'),
+    (3, 1, 30, '2022-10-12', 'CASH', null, 'INCOME'),
+    (6, 2, 45.5, '2023-11-02', 'BANK_TRANSFER', 'to work', 'EXPENSE'),
+    (6, 6, 20.7, '2023-12-04', 'CREDIT_CARD', 'necessity', 'EXPENSE'),
+    (6, 8, 3800, '2023-07-09', 'CRYPTOCURRENCY', null, 'EXPENSE');
 
-INSERT INTO `expense_tracker`.`income`
-(`user_id`, `amount`, `category_id`, `date`, `source`, `note`)
-VALUES
-(2, 100, 2, '2024-08-20', 'Credit Card', null);
+--
+-- Data for table `user_roles`
+--
 
-
-
-
+INSERT INTO `user_roles` (`user_id`, `role`) VALUES
+                                                 (1, 'ROLE_USER'),
+                                                 (2, 'ROLE_USER'),
+                                                 (3, 'ROLE_USER'),
+                                                 (4, 'ROLE_USER'),
+                                                 (5, 'ROLE_USER'),
+                                                 (6, 'ROLE_ADMIN');
