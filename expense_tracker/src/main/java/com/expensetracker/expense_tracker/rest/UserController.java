@@ -1,6 +1,9 @@
 package com.expensetracker.expense_tracker.rest;
 
+import com.expensetracker.expense_tracker.entity.Role;
 import com.expensetracker.expense_tracker.entity.User;
+import com.expensetracker.expense_tracker.entity.UserRole;
+import com.expensetracker.expense_tracker.service.UserRoleService;
 import com.expensetracker.expense_tracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +17,13 @@ public class UserController {
     UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    private UserRoleService userRoleService;
+
+    @Autowired
+    public UserController(UserService userService, UserRoleService userRoleService) {
+
         this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
     @GetMapping("/user")
@@ -40,7 +48,16 @@ public class UserController {
 
     @PostMapping("/user")
     public User addUser(@RequestBody User user) {
-        return userService.saveUser(user);
+        User savedUser = userService.saveUser(user);
+
+        UserRole userRole = new UserRole();
+        userRole.setUserId(savedUser.getId());
+        userRole.setRole(Role.ROLE_USER);
+        userRoleService.saveUserRole(userRole);
+
+        user.setRoles(List.of(Role.ROLE_USER));
+
+        return savedUser;
     }
 
     @DeleteMapping("/user/{userId}")

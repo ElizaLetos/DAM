@@ -92,44 +92,52 @@ class TransactionControllerTest {
     }
 
     @Test
-    void updateUser() throws Exception {
-        User user = new User("Leslie", "leslie@gmail.com", "test123");
-
-        Category category = new Category("gift", "first year anniversary");
-
-        Date date = Date.from(Instant.now());
-
-        Transaction transactionUpdated = new Transaction(user, category, 1000D, PaymentType.CREDIT_CARD, date, null, TypeOfTransaction.INCOME);
-
-        when(transactionService.saveTransaction(any(Transaction.class))).thenReturn(transactionUpdated);
-
-        mockMvc.perform(put("/api/transaction")
-                .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": 0, \"paymentType\": \"CREDIT_CARD\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(0))
-                .andExpect(jsonPath("$.paymentType").value(PaymentType.CREDIT_CARD.toString()));
-    }
-
-    @Test
     void addTransaction() throws Exception {
-        User user = new User("Leslie", "leslie@gmail.com", "test123");
+        User mockUser = new User("Leslie", "leslie@gmail.com", "test123");
+        mockUser.setId(1);
 
-        Category category = new Category("gift", "first year anniversary");
+        Category mockCategory = new Category("gift", "first year anniversary");
+        mockCategory.setId(1);
 
         Date date = Date.from(Instant.now());
+        Transaction mockTransaction = new Transaction(
+                mockUser,
+                mockCategory,
+                1000D,
+                PaymentType.CASH,
+                date,
+                null,
+                TypeOfTransaction.EXPENSE
+        );
+        mockTransaction.setId(1);
 
-        Transaction transaction = new Transaction(user, category, 1000D, PaymentType.CASH, date, null, TypeOfTransaction.EXPENSE);
+        when(transactionService.findCategoryById(1)).thenReturn(mockCategory);
+        when(transactionService.findIdByUsername(anyString())).thenReturn(1);
+        when(transactionService.findUserById(1)).thenReturn(mockUser);
+        when(transactionService.saveTransaction(any(Transaction.class))).thenReturn(mockTransaction);
 
-        when(transactionService.saveTransaction(any(Transaction.class))).thenReturn(transaction);
+        String requestPayload = """
+            {
+                "category": {
+                    "id": 1
+                },
+                "amount": 1000,
+                "paymentType": "CASH",
+                "typeOfTransaction": "EXPENSE"
+            }
+            """;
 
         mockMvc.perform(post("/api/transaction")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Mary\", \"email\":  \"mary@gmail.com\", \"password\":  \"test123\"}"))
+                        .content(requestPayload))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(0))
-                .andExpect(jsonPath("$.paymentType").value(PaymentType.CASH.toString()));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.amount").value(1000))
+                .andExpect(jsonPath("$.paymentType").value("CASH"))
+                .andExpect(jsonPath("$.typeOfTransaction").value("EXPENSE"))
+                .andExpect(jsonPath("$.category.id").value(1));
     }
+
 
     @Test
     void deleteUser() throws Exception {

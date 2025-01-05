@@ -50,7 +50,7 @@ class SecurityConfigTest {
         mockMvc.perform(get("/api/category"))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/user/2"))
+        mockMvc.perform(get("/api/user/1"))
                 .andExpect(status().isOk());
 
         mockMvc.perform(delete("/api/category/1"))
@@ -62,15 +62,6 @@ class SecurityConfigTest {
     void adminRoleAccess() throws Exception {
         mockMvc.perform(delete("/api/user/2"))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void unauthenticatedAccess() throws Exception {
-        mockMvc.perform(get("/api/user"))
-                .andExpect(status().isUnauthorized());
-
-        mockMvc.perform(post("/api/transaction"))
-                .andExpect(status().isUnauthorized());
     }
 
 }

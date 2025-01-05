@@ -1,6 +1,9 @@
 package com.expensetracker.expense_tracker.rest;
 
+import com.expensetracker.expense_tracker.entity.Role;
 import com.expensetracker.expense_tracker.entity.User;
+import com.expensetracker.expense_tracker.entity.UserRole;
+import com.expensetracker.expense_tracker.service.UserRoleService;
 import com.expensetracker.expense_tracker.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +26,9 @@ class UserControllerTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private UserRoleService userRoleService;
 
     @InjectMocks
     private UserController userController;
@@ -85,15 +91,29 @@ class UserControllerTest {
 
     @Test
     void addUser() throws Exception {
-        User user = new User("Mary", "mary@gmail.com", "test123");
+        User mockUser = new User("Mary", "mary@gmail.com", "test123");
+        mockUser.setId(1);
 
-        when(userService.saveUser(any(User.class))).thenReturn(user);
+        UserRole mockUserRole = new UserRole();
+        mockUserRole.setUserId(1);
+        mockUserRole.setRole(Role.ROLE_USER);
+
+        when(userService.saveUser(any(User.class))).thenReturn(mockUser);
+        doNothing().when(userRoleService).saveUserRole(any(UserRole.class));
+
+        String requestPayload = """
+            {
+                "name": "Mary",
+                "email": "mary@gmail.com",
+                "password": "test123"
+            }
+            """;
 
         mockMvc.perform(post("/api/user")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Mary\", \"email\":  \"mary@gmail.com\", \"password\":  \"test123\"}"))
+                        .content(requestPayload))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(0))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Mary"))
                 .andExpect(jsonPath("$.email").value("mary@gmail.com"));
     }

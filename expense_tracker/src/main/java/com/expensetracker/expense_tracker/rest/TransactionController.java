@@ -1,7 +1,9 @@
 package com.expensetracker.expense_tracker.rest;
 
 import com.expensetracker.expense_tracker.entity.Transaction;
+import com.expensetracker.expense_tracker.entity.Category;
 import com.expensetracker.expense_tracker.entity.TypeOfTransaction;
+import com.expensetracker.expense_tracker.entity.User;
 import com.expensetracker.expense_tracker.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -49,11 +51,47 @@ public class TransactionController {
 
     @PostMapping("/transaction")
     private Transaction addTransaction(@RequestBody Transaction transaction) {
+        if (transaction.getCategory() != null && transaction.getCategory().getId() > 0) {
+            Category category = transactionService.findCategoryById(transaction.getCategory().getId());
+            transaction.setCategory(category);
+        } else {
+            throw new RuntimeException("Category ID is missing or invalid");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            String username = authentication.getName();
+            int id = transactionService.findIdByUsername(username);
+            User user = transactionService.findUserById(id);
+            transaction.setUser(user);
+        }
+        else {
+            throw new RuntimeException("User ID is missing or invalid");
+        }
+
         return transactionService.saveTransaction(transaction);
     }
 
     @PutMapping("/transaction")
     private Transaction updateTransaction(@RequestBody Transaction transaction) {
+        if (transaction.getCategory() != null && transaction.getCategory().getId() > 0) {
+            Category category = transactionService.findCategoryById(transaction.getCategory().getId());
+            transaction.setCategory(category);
+        } else {
+            throw new RuntimeException("Category ID is missing or invalid");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            String username = authentication.getName();
+            int id = transactionService.findIdByUsername(username);
+            User user = transactionService.findUserById(id);
+            transaction.setUser(user);
+        }
+        else {
+            throw new RuntimeException("User ID is missing or invalid");
+        }
+
         return transactionService.saveTransaction(transaction);
     }
 

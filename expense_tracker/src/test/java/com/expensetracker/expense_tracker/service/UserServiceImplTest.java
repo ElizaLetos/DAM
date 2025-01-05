@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserDAO userDAO;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -50,11 +54,26 @@ class UserServiceImplTest {
 
     @Test
     void saveUser() {
+        // Mock User
         User user = new User("Leslie", "leslie@gmail.com", "test123");
-        when(userDAO.save(user)).thenReturn(user);
 
+        // Mock Behavior
+        when(passwordEncoder.encode(user.getPassword())).thenReturn("encodedPassword");
+        when(userDAO.save(user)).thenAnswer(invocation -> {
+            User savedUser = invocation.getArgument(0);
+            savedUser.setId(1); // Simulate setting the ID during save
+            return savedUser;
+        });
+
+        // Perform saveUser
         User result = userService.saveUser(user);
-        assertEquals(user, result, "saveUser should return the saved user");
+
+        // Assertions
+        assertNotNull(result, "Result should not be null");
+        assertEquals("encodedPassword", result.getPassword(), "Password should be encoded");
+        assertEquals(1, result.getId(), "ID should be set by the DAO");
+        assertEquals(user.getEmail(), result.getEmail(), "Email should match the input");
+        assertEquals(user.getName(), result.getName(), "Name should match the input");
     }
 
     @Test

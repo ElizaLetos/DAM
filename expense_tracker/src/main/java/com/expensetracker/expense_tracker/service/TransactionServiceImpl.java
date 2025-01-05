@@ -1,8 +1,12 @@
 package com.expensetracker.expense_tracker.service;
 
+import com.expensetracker.expense_tracker.dao.CategoryDAO;
 import com.expensetracker.expense_tracker.dao.TransactionDAO;
+import com.expensetracker.expense_tracker.dao.UserDAO;
+import com.expensetracker.expense_tracker.entity.Category;
 import com.expensetracker.expense_tracker.entity.Transaction;
 import com.expensetracker.expense_tracker.entity.TypeOfTransaction;
+import com.expensetracker.expense_tracker.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +18,15 @@ public class TransactionServiceImpl implements TransactionService{
 
     TransactionDAO transactionDAO;
 
+    CategoryDAO categoryDAO;
+
+    UserDAO userDAO;
+
     @Autowired
-    public TransactionServiceImpl(TransactionDAO transactionDAO) {
+    public TransactionServiceImpl(TransactionDAO transactionDAO, CategoryDAO categoryDAO, UserDAO userDAO) {
         this.transactionDAO = transactionDAO;
+        this.categoryDAO = categoryDAO;
+        this.userDAO = userDAO;
     }
 
     @Override
@@ -52,6 +62,18 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public List<Transaction> getTransactionsFromUser(int id) {
         return transactionDAO.getTransactionsFromUser(id);
+    }
+
+    @Override
+    public Category findCategoryById(int categoryId) {
+        return categoryDAO.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+    }
+
+    @Override
+    public User findUserById(int userId) {
+        return userDAO.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
     }
 
     @Override
