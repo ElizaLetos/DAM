@@ -20,8 +20,10 @@ public class UserController {
     private UserRoleService userRoleService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRoleService userRoleService) {
+
         this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
     @GetMapping("/user")
