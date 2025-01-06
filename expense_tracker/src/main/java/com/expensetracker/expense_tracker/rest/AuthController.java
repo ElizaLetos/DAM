@@ -1,6 +1,8 @@
 package com.expensetracker.expense_tracker.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,23 +23,29 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");
         String password = request.get("password");
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Generate a token (e.g., JWT) for simplicity, we'll return a placeholder
-        String token = "mock-jwt-token-for-" + username;
+            String token = "mock-jwt-token-for-" + username;
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("username", username);
-        response.put("token", token);
-        return response;
+            Map<String, Object> response = new HashMap<>();
+            response.put("username", username);
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
     }
 }
 
