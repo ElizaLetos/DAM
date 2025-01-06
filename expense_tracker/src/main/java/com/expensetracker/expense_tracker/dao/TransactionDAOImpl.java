@@ -65,7 +65,6 @@ public class TransactionDAOImpl implements TransactionDAOCustom {
         List<Transaction> transaction = new ArrayList<>();
         try {
             transaction = query.getResultList();
-            System.out.println("AAAAA " + transaction);
         }
         catch (Exception e) {
             e.printStackTrace();

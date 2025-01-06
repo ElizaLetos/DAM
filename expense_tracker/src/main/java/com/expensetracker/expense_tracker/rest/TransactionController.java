@@ -6,10 +6,14 @@ import com.expensetracker.expense_tracker.entity.TypeOfTransaction;
 import com.expensetracker.expense_tracker.entity.User;
 import com.expensetracker.expense_tracker.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -21,6 +25,33 @@ public class TransactionController {
     @Autowired
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
+    }
+
+    //export csv
+    @GetMapping("/transaction/export")
+    public ResponseEntity<byte[]> getTransactionsForExport(@RequestParam(required = false) TypeOfTransaction typeOfTransaction) throws IOException {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            String username = authentication.getName();
+            int id = transactionService.findIdByUsername(username);
+
+            List<Transaction> transactions;
+            if (typeOfTransaction == null) {
+                transactions = transactionService.getTransactionsFromUser(id);
+            } else {
+                transactions = transactionService.getTransactionsByType(typeOfTransaction, id);
+            }
+
+            String csvData = convertToCSV(transactions);
+            byte[] csvBytes = csvData.getBytes();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=transactions.csv");
+
+            return new ResponseEntity<>(csvBytes, headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/transaction")
