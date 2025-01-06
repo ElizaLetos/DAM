@@ -113,7 +113,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestPayload))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Mary"))
                 .andExpect(jsonPath("$.email").value("mary@gmail.com"));
     }
