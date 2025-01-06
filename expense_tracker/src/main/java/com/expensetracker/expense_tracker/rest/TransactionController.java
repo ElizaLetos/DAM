@@ -6,10 +6,14 @@ import com.expensetracker.expense_tracker.entity.TypeOfTransaction;
 import com.expensetracker.expense_tracker.entity.User;
 import com.expensetracker.expense_tracker.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,20 +27,31 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    //for export
     @GetMapping("/transaction")
-    private List<Transaction> getAllTransactions(@RequestParam(required = false) TypeOfTransaction typeOfTransaction) {
+    public ResponseEntity<byte[]> getAllTransactions(@RequestParam(required = false) TypeOfTransaction typeOfTransaction) throws IOException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             String username = authentication.getName();
             int id = transactionService.findIdByUsername(username);
+
+            List<Transaction> transactions;
             if (typeOfTransaction == null) {
-                return transactionService.getTransactionsFromUser(id);
+                transactions = transactionService.getTransactionsFromUser(id);
             } else {
-                return transactionService.getTransactionsByType(typeOfTransaction, id);
+                transactions = transactionService.getTransactionsByType(typeOfTransaction, id);
             }
+
+            String csvData = convertToCSV(transactions);
+            byte[] csvBytes = csvData.getBytes();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=transactions.csv");
+
+            return new ResponseEntity<>(csvBytes, headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        else return List.of();
     }
 
     @GetMapping("/transaction/{transactionId}")
@@ -104,5 +119,28 @@ public class TransactionController {
         }
 
         transactionService.deleteTransaction(transactionId);
+    }
+
+    private String convertToCSV(List<Transaction> transactions) {
+        StringBuilder csvBuilder = new StringBuilder();
+
+        csvBuilder.append("Category,Amount, PaymentType, Date, Note, TypeOfTransaction\n");
+
+        for (Transaction transaction : transactions) {
+            csvBuilder.append(transaction.getCategory())
+                    .append(",")
+                    .append(transaction.getAmount())
+                    .append(",")
+                    .append(transaction.getPaymentType())
+                    .append(",")
+                    .append(transaction.getDate())
+                    .append(",")
+                    .append(transaction.getNote())
+                    .append(",")
+                    .append(transaction.getTypeOfTransaction())
+                    .append("\n");
+        }
+
+        return csvBuilder.toString();
     }
 }
