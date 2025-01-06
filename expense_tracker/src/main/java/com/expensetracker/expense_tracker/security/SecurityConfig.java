@@ -39,12 +39,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/transaction", "/api/category",
-                                "api/transaction/**", "/api/category/**").hasRole("USER")
+                                "/api/transaction/**", "/api/category/**").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/transaction", "/api/category").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/user", "/api/transaction", "/api/category").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE,
-                                "api/transaction/**").hasRole("USER")
+                                "/api/transaction/**").hasRole("USER")
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/category",
@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/transaction", "/api/category").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,
-                                "/api/category/**", "api/transaction/**").hasRole("ADMIN")
+                                "/api/category/**", "/api/transaction/**").hasRole("ADMIN")
         );
         http.authorizeHttpRequests(configurer ->
                 configurer

@@ -13,4 +13,6 @@ public interface TransactionDAOCustom {
 
     List<Transaction> getTransactionsFromUser(int id);
 
+    List<Transaction> getTypeOfTransactionsFromCategory(int categoryId, int userId, TypeOfTransaction type_of_transaction);
+
 }

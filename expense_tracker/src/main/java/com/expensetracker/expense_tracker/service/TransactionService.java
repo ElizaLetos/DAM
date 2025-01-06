@@ -26,4 +26,6 @@ public interface TransactionService {
     Category findCategoryById(int categoryId);
 
     User findUserById(int userId);
+
+    List<Transaction> getTypeOfTransactionsByCategory(int categoryId, int userId, TypeOfTransaction typeOfTransaction);
 }

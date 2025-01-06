@@ -77,6 +77,11 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
     @Override
+    public List<Transaction> getTypeOfTransactionsByCategory(int categoryId, int userId, TypeOfTransaction typeOfTransaction) {
+        return transactionDAO.getTypeOfTransactionsFromCategory(categoryId, userId, typeOfTransaction);
+    }
+
+    @Override
     public void deleteTransaction(int id) {
 
         if (transactionDAO.findById(id).isPresent()) {

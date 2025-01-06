@@ -55,4 +55,21 @@ public class TransactionDAOImpl implements TransactionDAOCustom {
             throw new RuntimeException("An error occurred while finding the user's transactions", e);
         }
     }
+
+    @Override
+    public List<Transaction> getTypeOfTransactionsFromCategory(int categoryId, int userId, TypeOfTransaction type_of_transaction) {
+        TypedQuery<Transaction> query = entityManager.createQuery("from Transaction t where t.user.id = :userId and t.category.id = :categoryId and t.typeOfTransaction = :type_of_transaction", Transaction.class);
+        query.setParameter("userId", userId);
+        query.setParameter("categoryId", categoryId);
+        query.setParameter("type_of_transaction", type_of_transaction);
+        List<Transaction> transaction = new ArrayList<>();
+        try {
+            transaction = query.getResultList();
+            System.out.println("AAAAA " + transaction);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return transaction;
+    }
 }
