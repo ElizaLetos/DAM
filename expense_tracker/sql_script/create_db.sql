@@ -39,8 +39,8 @@ CREATE TABLE `transaction` (
                                `note` varchar(45) DEFAULT NULL,
                                `type_of_transaction` ENUM('INCOME', 'EXPENSE') NOT NULL,
                                PRIMARY KEY (id),
-                               FOREIGN KEY (user_id) REFERENCES users(id),
-                               FOREIGN KEY (category_id) REFERENCES category(id)
+                               FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                               FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 --
@@ -97,7 +97,8 @@ VALUES
     (3, 1, 30, '2022-10-12', 'CASH', null, 'INCOME'),
     (6, 2, 45.5, '2023-11-02', 'BANK_TRANSFER', 'to work', 'EXPENSE'),
     (6, 6, 20.7, '2023-12-04', 'CREDIT_CARD', 'necessity', 'EXPENSE'),
-    (6, 8, 3800, '2023-07-09', 'CRYPTOCURRENCY', null, 'EXPENSE');
+    (6, 8, 3800, '2023-07-09', 'CRYPTOCURRENCY', null, 'EXPENSE'),
+    (1, 8, 1000, '2024-10-05', 'CREDIT_CARD', null, 'INCOME');
 
 --
 -- Data for table `user_roles`
